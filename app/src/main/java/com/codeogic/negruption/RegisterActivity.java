@@ -3,6 +3,8 @@ package com.codeogic.negruption;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -28,12 +31,19 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener,CompoundButton.OnCheckedChangeListener{
 
-    EditText name,phone,email,username,password;
+    EditText name,phone,email,username,password,password1;
     Button register;
     RadioButton male,female;
 
+
+
+    ConnectivityManager connectivityManager;
+    NetworkInfo networkInfo;
+
     User user;
      RequestQueue requestQueue;
+
+    RadioGroup radioGroupGender;
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -46,10 +56,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         email=(EditText)findViewById(R.id.registerEmail);
         username=(EditText)findViewById(R.id.registerUsername);
         password=(EditText)findViewById(R.id.registerPassword);
-      //  password1=(EditText)findViewById(R.id.registerPassword1);
+       password1=(EditText)findViewById(R.id.registerPassword1);
         male=(RadioButton)findViewById(R.id.rbMale);
         female=(RadioButton)findViewById(R.id.rbFemale);
         register=(Button)findViewById(R.id.btnRegister1);
+        radioGroupGender=(RadioGroup)findViewById(R.id.radioGroup) ;
+
 
         requestQueue= Volley.newRequestQueue(this);
 
@@ -69,6 +81,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    public boolean isNetworkConnected(){
+
+        connectivityManager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        networkInfo=connectivityManager.getActiveNetworkInfo();
+
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
     @Override
     public void onClick(View v) {
         int id=v.getId();
@@ -79,6 +99,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             user.setEmail(email.getText().toString().trim());
             user.setUsername(username.getText().toString().trim());
             user.setPassword(password.getText().toString().trim());
+
+            validateFields();
 
            insertIntoCloud();
 
@@ -180,10 +202,69 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         female.setChecked(false);
         username.setText("");
         password.setText("");
+        password1.setText("");
 
 
 
+    }
 
+    public boolean validateFields(){
+
+        boolean flag=true;
+
+
+        if (user.getName().isEmpty()){
+            flag=false;
+            name.setError(" Name Cannot Be Empty ");
+            name.requestFocus();
+
+        }
+
+        if (user.getPhone().isEmpty()){
+
+            flag=false;
+            phone.setError(" Phone Number Cannot Be Empty ");
+            phone.requestFocus();
+        }else if (user.getPhone().length()<10){
+
+            flag=false;
+            phone.setError(" Please Enter 10 digits Phone Number ");
+            phone.requestFocus();
+        }
+
+        if (user.getUsername().isEmpty()){
+
+            flag=false;
+            username.setError(" Username Cannot Be Empty ");
+            username.requestFocus();
+        }else if (user.getUsername().length()<5){
+
+            flag=false;
+            username.setError(" Username Should Be Minimum 5 characters long");
+            username.requestFocus();
+        }
+
+        if(user.getPassword().isEmpty()){
+            flag=false;
+            password.setError("Password Cannot Be Empty");
+            password.requestFocus();
+
+        }else if (user.password.length()<8){
+            flag=false;
+            password.setError("Choose A Strong Password Of Minimum Length 8");
+            password.requestFocus();
+
+        }
+        else if(user.getPassword() != password1.getText().toString().trim()){
+
+            flag=false;
+            password1.setError("The Password Does not Match , Please Re-Enter");
+            password1.requestFocus();
+        }
+
+
+
+        return flag;
     }
 
     }
