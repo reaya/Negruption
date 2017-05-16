@@ -2,6 +2,8 @@ package com.codeogic.negruption;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +36,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     SharedPreferences.Editor editor;
 
     User user;
+    ConnectivityManager connectivityManager;
+    NetworkInfo networkInfo;
+
+    public boolean isNetworkConnected(){
+
+        connectivityManager=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        networkInfo=connectivityManager.getActiveNetworkInfo();
+
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
 
     public void init(){
 
@@ -69,8 +82,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
            user.setUsername(uname.getText().toString().trim());
            user.setPassword(password.getText().toString().trim());
-            loginIntoCloud();
 
+            if (validateLogin()){
+            if (isNetworkConnected()){
+            loginIntoCloud();
+        }else
+            {
+                Toast.makeText(LoginActivity.this,"Please Connect To Internet",Toast.LENGTH_LONG).show();
+            }
+
+        }
+        else{
+
+                Toast.makeText(LoginActivity.this,"Please Correct Your Input",Toast.LENGTH_LONG).show();
+            }
         }
 
 
@@ -122,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Map<String,String> map = new HashMap<>();
                 map.put("username",user.getUsername());
                 map.put("password",user.getPassword());
-                Log.i("userName",user.getUsername() + user.getPassword());
+             //   Log.i("userName",user.getUsername() + user.getPassword());
                 return map;
             }
         };
@@ -130,6 +155,37 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     }
+    public boolean validateLogin(){
+
+        boolean flag =true;
+
+     if (user.getUsername().isEmpty()){
+
+        flag=false;
+        uname.setError(" Username Cannot Be Empty ");
+        uname.requestFocus();
+    }
+        else if (user.getUsername().contains(" ")){
+        flag=false;
+        uname.setError("No Spaces Allowed");
+        uname.requestFocus();
+    }
+
+        if(user.getPassword().isEmpty()){
+        flag=false;
+        password.setError("Password Cannot Be Empty");
+        password.requestFocus();
 
     }
+        else if (user.getPassword().contains(" ")){
+
+        flag=false;
+        password.setError("No Spaces Allowed");
+        password.requestFocus();
+    }
+
+    return flag;
+
+    }
+}
 

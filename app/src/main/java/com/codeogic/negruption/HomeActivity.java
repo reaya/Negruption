@@ -114,6 +114,9 @@ public class HomeActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_honestStories) {
 
+            Intent i =new Intent(HomeActivity.this,HonestStory.class);
+            startActivity(i);
+
         } else if (id == R.id.nav_location) {
 
         } else if (id == R.id.nav_manageAccount) {

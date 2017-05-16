@@ -7,6 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
+    android:background="@drawable/addstory1"
     android:padding="20dp"
     tools:context="com.codeogic.negruption.AddStoryActivity">
 
@@ -30,7 +32,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/addstory1"
+
         android:orientation="vertical">
 
 
@@ -114,13 +116,6 @@
             android:id="@+id/imageButtonPhoto"
             android:background="@drawable/photo_camera" />
 
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="40dp"
-            android:id="@+id/imageButtonVideo"
-            android:background="@drawable/video_player" />
 
         <ImageButton
             android:layout_width="40dp"
@@ -129,6 +124,16 @@
             android:layout_marginLeft="40dp"
             android:id="@+id/imageButtonAudio"
             android:background="@drawable/volume" />
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="40dp"
+                android:id="@+id/imageButtonVideo"
+                android:background="@drawable/video_player" />
+
+
         </LinearLayout>
 
 
@@ -144,6 +149,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:textSize="10dp"
+            android:textColor="@color/darkgreen"
             android:text="Encounter with an Honest Officer ? Click Here"
             android:id="@+id/textViewHonestOfficer"
 

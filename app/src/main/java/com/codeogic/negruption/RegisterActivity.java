@@ -44,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
      RequestQueue requestQueue;
 
     RadioGroup radioGroupGender;
+//   int radioButtonId = radioGroupGender.getCheckedRadioButtonId();
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -56,10 +57,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         email=(EditText)findViewById(R.id.registerEmail);
         username=(EditText)findViewById(R.id.registerUsername);
         password=(EditText)findViewById(R.id.registerPassword);
-       password1=(EditText)findViewById(R.id.registerPassword1);
+        password1=(EditText)findViewById(R.id.registerPassword1);
         male=(RadioButton)findViewById(R.id.rbMale);
         female=(RadioButton)findViewById(R.id.rbFemale);
         register=(Button)findViewById(R.id.btnRegister1);
+
+
         radioGroupGender=(RadioGroup)findViewById(R.id.radioGroup) ;
 
 
@@ -100,10 +103,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             user.setUsername(username.getText().toString().trim());
             user.setPassword(password.getText().toString().trim());
 
-            validateFields();
 
-           insertIntoCloud();
+            if(validateFields()){
 
+                if (isNetworkConnected()){
+                    insertIntoCloud();
+                }
+                else
+                    Toast.makeText(this,"Please Connect To Internet",Toast.LENGTH_LONG).show();
+
+            }
+            else
+                Toast.makeText(this,"Please Correct The Registration Input",Toast.LENGTH_LONG).show();
 
         }
     }
@@ -113,6 +124,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         int id=buttonView.getId();
         if (isChecked){
             if (id==R.id.rbMale){
+
                  user.setGender("male");
 
             }
@@ -231,6 +243,28 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             phone.setError(" Please Enter 10 digits Phone Number ");
             phone.requestFocus();
         }
+        else if (user.getPhone().contains(" ")){
+            flag=false;
+            phone.setError("No Spaces Allowed");
+            phone.requestFocus();
+        }
+
+        if (user.getEmail().isEmpty()){
+            flag=false;
+            email.setError("Email Cannot Be Empty");
+            email.requestFocus();
+        }
+        else if (!(user.getEmail().contains("@")&& user.getEmail().contains("."))){
+            flag=false;
+            email.setError("Please Enter Valid Email");
+            email.requestFocus();
+
+        }
+        else if (user.getEmail().contains(" ")){
+            flag=false;
+            email.setError("No spaces allowed");
+            email.requestFocus();
+        }
 
         if (user.getUsername().isEmpty()){
 
@@ -243,15 +277,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             username.setError(" Username Should Be Minimum 5 characters long");
             username.requestFocus();
         }
+        else if (user.getUsername().contains(" ")){
+            flag=false;
+            username.setError("No Spaces Allowed");
+            username.requestFocus();
+        }
 
         if(user.getPassword().isEmpty()){
             flag=false;
             password.setError("Password Cannot Be Empty");
             password.requestFocus();
 
-        }else if (user.password.length()<8){
+        }else if (user.password.length()<6){
             flag=false;
-            password.setError("Choose A Strong Password Of Minimum Length 8");
+            password.setError("Choose A Strong Password Of Minimum Length 6");
             password.requestFocus();
 
         }
@@ -261,6 +300,36 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             password1.setError("The Password Does not Match , Please Re-Enter");
             password1.requestFocus();
         }
+        else if (user.getPassword().contains(" ")){
+
+            flag=false;
+            password.setError("No Spaces Allowed");
+            password.requestFocus();
+        }
+
+        if (radioGroupGender.getCheckedRadioButtonId() == -1){
+            flag=false;
+
+            male.setError("No Gender Selected");
+            female.setError("No Gender Selected");
+
+            Toast.makeText(this,"Please Select Gender",Toast.LENGTH_LONG).show();
+
+
+        }
+
+     /*  if (radioButtonId==-1){
+
+            flag=false;
+
+            male.setError("No Gender Selected");
+            female.setError("No Gender Selected");
+
+            Toast.makeText(this,"Please Select Gender",Toast.LENGTH_LONG).show();
+
+        }*/
+
+
 
 
 

@@ -2,19 +2,41 @@ package com.codeogic.negruption;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 public class SplashActivity extends AppCompatActivity {
 
+
+
+ImageView imageViewSplash;
     SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+      imageViewSplash=(ImageView)findViewById(R.id.imageView);
+
+        Animation animation=AnimationUtils.loadAnimation(this,R.anim.frame_animation);
+        imageViewSplash.startAnimation(animation);
+
+        AnimationDrawable animationDrawable=(AnimationDrawable)imageViewSplash.getBackground();
+        animationDrawable.start();
+
+
 
 
         sharedPreferences = getSharedPreferences(Util.PREFS_NAME, MODE_PRIVATE);
@@ -26,6 +48,8 @@ public class SplashActivity extends AppCompatActivity {
         } else {
              handler.sendEmptyMessageDelayed(200,2500);
         }
+
+
     }
 
     
@@ -50,4 +74,6 @@ public class SplashActivity extends AppCompatActivity {
 
 
     };
+
+
 }
