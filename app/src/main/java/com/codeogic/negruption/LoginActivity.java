@@ -1,9 +1,16 @@
 package com.codeogic.negruption;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final int REQUEST_CODE= 101;
 
 
     EditText uname,password;
@@ -63,6 +72,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         init();
+
+        int permission= ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+
+        if (permission != PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this,"Permissions denied",Toast.LENGTH_LONG).show();
+
+            //makeRequest();
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.RECORD_AUDIO)){
+
+                AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                builder.setTitle("Permission Required");
+                builder.setMessage("Permission to access microphone is required for this app to record audio");
+
+                builder.setPositiveButton("O K A Y", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Toast.makeText(LoginActivity.this,"Clicked Okay",Toast.LENGTH_LONG).show();
+                        makeRequest();
+                    }
+                });
+                builder.create().show();
+            }
+            else
+                makeRequest();
+        }
+
+
         login.setOnClickListener(this);
         register.setOnClickListener(this);
         user=new User();
@@ -72,7 +109,53 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         sharedPreferences=getSharedPreferences(Util.PREFS_NAME,MODE_PRIVATE);
         editor=sharedPreferences.edit();
+
+
+
     }
+    protected void makeRequest(){
+
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},REQUEST_CODE);
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode){
+
+            case REQUEST_CODE :
+
+                if (grantResults.length==0 || grantResults[0] != PackageManager.PERMISSION_GRANTED){
+
+                    Toast.makeText(this,"User Has Denied The Permissions",Toast.LENGTH_LONG).show();
+
+                    AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                    builder.setTitle("Permission Required");
+                    builder.setMessage("Permission to access microphone is required for this app to record audio");
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            Toast.makeText(LoginActivity.this,"Clicked Okay",Toast.LENGTH_LONG).show();
+                            makeRequest();
+                        }
+                    });
+                    builder.create().show();
+                }
+                else {
+
+                    Toast.makeText(this,"User granted the permissions",Toast.LENGTH_LONG).show();
+                }
+                return;
+                }
+
+        }
+
+
+
+
 
     @Override
     public void onClick(View v) {
