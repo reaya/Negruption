@@ -32,6 +32,10 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int REQUEST_CODE= 101;
@@ -73,31 +77,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
         init();
 
-        int permission= ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        if (checkPermission()){
 
-        if (permission != PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this,"Permissions denied",Toast.LENGTH_LONG).show();
-
-            //makeRequest();
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.RECORD_AUDIO)){
-
-                AlertDialog.Builder builder=new AlertDialog.Builder(this);
-                builder.setTitle("Permission Required");
-                builder.setMessage("Permission to access microphone is required for this app to record audio");
-
-                builder.setPositiveButton("O K A Y", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        Toast.makeText(LoginActivity.this,"Clicked Okay",Toast.LENGTH_LONG).show();
-                        makeRequest();
-                    }
-                });
-                builder.create().show();
-            }
-            else
-                makeRequest();
+            Toast.makeText(this,"Permissions Are Already Granted",Toast.LENGTH_LONG).show();
         }
+        else {
+            Toast.makeText(this,"Permissions are not granted ",Toast.LENGTH_LONG).show();
+            requestPermission();
+        }
+
+
 
 
         login.setOnClickListener(this);
@@ -113,47 +102,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     }
-    protected void makeRequest(){
-
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},REQUEST_CODE);
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        switch (requestCode){
-
-            case REQUEST_CODE :
-
-                if (grantResults.length==0 || grantResults[0] != PackageManager.PERMISSION_GRANTED){
-
-                    Toast.makeText(this,"User Has Denied The Permissions",Toast.LENGTH_LONG).show();
-
-                    AlertDialog.Builder builder=new AlertDialog.Builder(this);
-                    builder.setTitle("Permission Required");
-                    builder.setMessage("Permission to access microphone is required for this app to record audio");
-
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            Toast.makeText(LoginActivity.this,"Clicked Okay",Toast.LENGTH_LONG).show();
-                            makeRequest();
-                        }
-                    });
-                    builder.create().show();
-                }
-                else {
-
-                    Toast.makeText(this,"User granted the permissions",Toast.LENGTH_LONG).show();
-                }
-                return;
-                }
-
-        }
-
-
 
 
 
@@ -269,6 +217,67 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     return flag;
 
+    }
+
+
+    private void requestPermission() {
+
+        ActivityCompat.requestPermissions(LoginActivity.this, new String[]{WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,RECORD_AUDIO}, REQUEST_CODE);
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE:
+                if (grantResults.length > 0) {
+
+                    boolean WritePermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean ReadPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean RecordPermission = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+
+                    if (WritePermission && RecordPermission && ReadPermission) {
+
+                        Toast.makeText(LoginActivity.this, "Permissions Granted", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        Toast.makeText(LoginActivity.this,"Permissions Denied",Toast.LENGTH_LONG).show();
+
+                        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                        builder.setTitle("Permissions Required");
+                        builder.setMessage("Kindly Grant The Permissions For Proper Working of Application ");
+
+                        builder.setPositiveButton("O K A Y", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                requestPermission();
+                                Toast.makeText(LoginActivity.this,"Clicked Okay",Toast.LENGTH_LONG).show();
+
+
+                            }
+                        });
+
+
+                        builder.create().show();
+
+                        // finish();
+
+
+                    }
+                }
+
+                break;
+        }
+    }
+
+    public boolean checkPermission() {
+
+        int result = ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
+        int result1 = ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
+        int result2=ContextCompat.checkSelfPermission(this,RECORD_AUDIO);
+
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2==PackageManager.PERMISSION_GRANTED;
     }
 }
 
